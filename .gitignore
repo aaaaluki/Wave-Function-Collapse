@@ -1,0 +1,6 @@
+# Build and binary dirs
+bin/
+build/
+
+# Test dir
+test/
