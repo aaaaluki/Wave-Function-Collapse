@@ -1,6 +1,11 @@
+# VSCode folder
+.vscode/
+
 # Build and binary dirs
 bin/
 build/
 
 # Test dir
 test/
+
+test_img.png
