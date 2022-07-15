@@ -10,12 +10,11 @@
 
 #include <cairo.h>
 
+#define WIDTH  256
+#define HEIGHT 256
 
-#define WIDTH   256
-#define HEIGHT  256
-
-#define NCOLS   8
-#define NROWS   8
+#define NCOLS 8
+#define NROWS 8
 
 const char *msg = "Hello, world!";
 
@@ -38,10 +37,10 @@ int draw_image(int argc, char **argv) {
   glob_t *globbuf = malloc(sizeof(glob_t));
   char *expr = "/*.png";
   int r;
-  char *buff = (char *)malloc(sizeof(char)*(strlen(expr) + strlen(expr) + 1));
+  char *buff = (char *)malloc(sizeof(char) * (strlen(expr) + strlen(expr) + 1));
 
   memcpy(buff, dirname, strlen(dirname));
-  memcpy(buff + sizeof(char)*strlen(dirname), expr, strlen(expr));
+  memcpy(buff + sizeof(char) * strlen(dirname), expr, strlen(expr));
 
   r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
 
@@ -68,12 +67,14 @@ int draw_image(int argc, char **argv) {
 
   // Get width and height of the tiles
   int w, h;
-  cairo_surface_t *tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[0]);
+  cairo_surface_t *tile =
+      cairo_image_surface_create_from_png(globbuf->gl_pathv[0]);
   w = cairo_image_surface_get_width(tile);
   h = cairo_image_surface_get_height(tile);
   printf("Tile is %dx%d\n", w, h);
 
-  cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, size*w, size*h);
+  cairo_surface_t *surface =
+      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, size * w, size * h);
   cairo_t *cr = cairo_create(surface);
 
   uint32_t row = 0;
@@ -84,7 +85,7 @@ int draw_image(int argc, char **argv) {
 
     tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[i]);
 
-    cairo_set_source_surface(cr, tile, col*w, row*h);
+    cairo_set_source_surface(cr, tile, col * w, row * h);
     cairo_paint(cr);
   }
 
@@ -107,7 +108,8 @@ int draw_image(int argc, char **argv) {
 // Test draw
 void draw_chessboard(void) {
   // Create surface
-  cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, HEIGHT);
+  cairo_surface_t *surface =
+      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, HEIGHT);
   cairo_t *cr = cairo_create(surface);
 
   // Set background to black
@@ -120,9 +122,9 @@ void draw_chessboard(void) {
   h = HEIGHT / NROWS;
   for (uint32_t i = 0; i < NROWS; i++) {
     for (uint32_t j = 0; j < NCOLS; j++) {
-      cairo_rectangle(cr, w*j, h*i, w, h);
+      cairo_rectangle(cr, w * j, h * i, w, h);
 
-      if ((i+j) % 2 == 0) {
+      if ((i + j) % 2 == 0) {
         cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
       } else {
         cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
@@ -136,12 +138,13 @@ void draw_chessboard(void) {
   cairo_text_extents_t *extents = malloc(sizeof(cairo_text_extents_t));
   double x, y;
 
-  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(cr, 32.0);
   cairo_set_source_rgb(cr, 0.2, 0.7, 0.5);
   cairo_text_extents(cr, msg, extents);
-  x = WIDTH / 2 - (extents->width/2 + extents->x_bearing);
-  y = HEIGHT / 2 - (extents->height/2 + extents->y_bearing);
+  x = WIDTH / 2 - (extents->width / 2 + extents->x_bearing);
+  y = HEIGHT / 2 - (extents->height / 2 + extents->y_bearing);
   cairo_move_to(cr, x, y);
   cairo_show_text(cr, msg);
 
@@ -149,6 +152,6 @@ void draw_chessboard(void) {
   cairo_destroy(cr);
   cairo_surface_write_to_png(surface, "hello.png");
   cairo_surface_destroy(surface);
-  
+
   free(extents);
 }
