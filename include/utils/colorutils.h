@@ -1,5 +1,11 @@
-#ifndef __H_COLOR
-#define __H_COLOR
+/**
+ * @file colorutils.h
+ * @brief Set of macros containing ANSI color escape codes
+ *
+ */
+
+#ifndef COLOR_H_
+#define COLOR_H_
 
 #define COLOR_RESET "\033[0m"
 
@@ -66,5 +72,4 @@
 #define COLOR_CYAN_BACKGROUND_BRIGHT   "\033[0;106m"
 #define COLOR_WHITE_BACKGROUND_BRIGHT  "\033[0;107m"
 
-/* __H_COLOR */
-#endif
+#endif // COLOR_H_

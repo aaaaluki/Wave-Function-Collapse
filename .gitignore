@@ -1,11 +1,14 @@
 # VSCode folder
-.vscode/
+/.vscode/
 
 # Build and binary dirs
-bin/
-build/
+/bin/
+/build*/
+
+# Subprojects
+/subprojects/*
+!/subprojects/*.wrap
 
 # Test dir
-test/
-
-test_img.png
+/test/
+/test_img.png

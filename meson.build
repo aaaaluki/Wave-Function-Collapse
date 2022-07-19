@@ -13,8 +13,8 @@ project_sources = []
 project_header_files = []
 project_test_sources = []
 
-inc = [include_directories('src/include')]
-subdir('src/include')
+inc = [include_directories('include')]
+subdir('include')
 
 # This triggers the builds of sources
 project_deps = []
@@ -27,3 +27,30 @@ project_bin = executable('wfc',
   dependencies : project_deps,
   link_with : project_libs,
   install: true)
+
+# Make test if specified
+gtest = subproject('gtest')
+if get_option('enable-tests')
+  subdir('tests')
+endif
+
+run_target('format',
+  command : [
+    'clang-format',
+    '-i',
+    '-style=file',
+    project_sources,
+    project_header_files,
+    project_test_sources,
+  ]
+)
+
+run_target('tidy',
+  command : [
+    'clang-tidy',
+    '--format-style=file',
+    project_sources,
+    project_header_files,
+    project_test_sources,
+  ]
+)
