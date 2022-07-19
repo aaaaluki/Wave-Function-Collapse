@@ -10,6 +10,9 @@
 
 #include <cairo.h>
 
+#include "utils/numutils.h"
+#include "utils/printutils.h"
+
 #define WIDTH  256
 #define HEIGHT 256
 
@@ -29,8 +32,7 @@ int main(int argc, char **argv) {
 // Test draw from file
 int draw_image(int argc, char **argv) {
   if (argc < 2) {
-    fprintf(stderr, "[ERROR] Please give a folder with tile images!\n");
-    return 1;
+    errmsg("Please give a folder with tile images!", 1);
   }
 
   char *dirname = argv[1];
@@ -45,25 +47,14 @@ int draw_image(int argc, char **argv) {
   r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
 
   if (r == GLOB_ABORTED) {
-    fprintf(stderr, "[ERROR] Some error occurred!\n");
-    return 1;
+    errmsg("Some error occurred!", 1);
 
   } else if (r == GLOB_NOMATCH) {
-    fprintf(stderr, "[ERROR] No .png files on the given directory!\n");
-    return 1;
+    errmsg("No .png files on the given directory!", 1);
   }
 
-  // Find next pow 2 of matches
-  // Sauce: http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-  uint32_t size = globbuf->gl_pathc;
-  size--;
-  size |= size >> 1;
-  size |= size >> 2;
-  size |= size >> 4;
-  size |= size >> 8;
-  size |= size >> 16;
-  size++;
-  size = (uint32_t)ceilf(sqrtf(size));
+  uint32_t size = next_pow2(globbuf->gl_pathc);
+  size = (uint32_t)ceilf(sqrtf((float)size));
 
   // Get width and height of the tiles
   int w, h;

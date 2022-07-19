@@ -1,17 +1,9 @@
 # Project dependencies
-dep_cairo = dependency('cairo')
-dep_x11 = dependency('X11')
+project_deps += meson.get_compiler('c').find_library('m', required : true)
+project_deps += dependency('cairo')
 
 # Project sources
-sources = [
-    'main.c',
-]
+main_source = files('main.c')
+project_sources += main_source
 
-executable(
-    'wfc',
-    sources: sources,
-    dependencies: [dep_cairo, dep_x11],
-    include_directories: inc,
-    link_args: ['-lm'],
-    install: true,
-)
+subdir('utils')
