@@ -12,6 +12,7 @@
 
 #include "utils/numutils.h"
 #include "utils/printutils.h"
+#include "utils/stringutils.h"
 
 #define WIDTH  256
 #define HEIGHT 256
@@ -32,25 +33,24 @@ int main(int argc, char **argv) {
 // Test draw from file
 int draw_image(int argc, char **argv) {
   if (argc < 2) {
-    errmsg("Please give a folder with tile images!", 1);
+    errmsg("Please give a folder with tile images!", EXIT_FAILURE);
   }
 
   char *dirname = argv[1];
+  char *buff = strconcat(dirname, "/*.png");
+  if (buff == NULL) {
+    errmsg("Some error occurred while using strconcat()", EXIT_FAILURE);
+  }
+
   glob_t *globbuf = malloc(sizeof(glob_t));
-  char *expr = "/*.png";
-  int r;
-  char *buff = (char *)malloc(sizeof(char) * (strlen(expr) + strlen(expr) + 1));
-
-  memcpy(buff, dirname, strlen(dirname));
-  memcpy(buff + sizeof(char) * strlen(dirname), expr, strlen(expr));
-
-  r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
+  int r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
 
   if (r == GLOB_ABORTED) {
-    errmsg("Some error occurred!", 1);
+    errmsg("Some error occurred while globing the tile directory!",
+           EXIT_FAILURE);
 
   } else if (r == GLOB_NOMATCH) {
-    errmsg("No .png files on the given directory!", 1);
+    errmsg("No .png files on the given directory!", EXIT_FAILURE);
   }
 
   uint32_t size = next_pow2(globbuf->gl_pathc);
@@ -62,7 +62,7 @@ int draw_image(int argc, char **argv) {
       cairo_image_surface_create_from_png(globbuf->gl_pathv[0]);
   w = cairo_image_surface_get_width(tile);
   h = cairo_image_surface_get_height(tile);
-  printf("Tile is %dx%d\n", w, h);
+  printf("Tile is %dx%d pixels\n", w, h);
 
   cairo_surface_t *surface =
       cairo_image_surface_create(CAIRO_FORMAT_ARGB32, size * w, size * h);
@@ -81,9 +81,8 @@ int draw_image(int argc, char **argv) {
   }
 
   // Save tile
-  char savefile[128];
-  sprintf(savefile, "%s-tile.png", dirname);
-  printf("Saving as: %s-tile.png", dirname);
+  char *savefile = strconcat(dirname, "-tile.png");
+  printf("Saving as: %s\n", savefile);
   cairo_surface_write_to_png(surface, savefile);
 
   // Cleanup
@@ -93,7 +92,7 @@ int draw_image(int argc, char **argv) {
   free(buff);
   free(globbuf);
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 // Test draw

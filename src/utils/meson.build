@@ -1,6 +1,7 @@
 utils_sources = []
 utils_sources += files('numutils.c')
 utils_sources += files('printutils.c')
+utils_sources += files('stringutils.c')
 
 utils_lib = static_library('utils',
                             utils_sources,

@@ -1,5 +1,6 @@
 utilstest_sources = [
-    'numutilstest.cc'
+    'numutilstest.cc',
+    'stringutilstest.cc'
 ]
 
 utilstest_deps = []
