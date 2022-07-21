@@ -22,7 +22,7 @@ all_test_deps += test_deps
 all_test_libs += test_libs
 
 all_tests = executable('all_tests',
-    project_test_sources,
+    test_main,
     include_directories : inc,
     dependencies : all_test_deps,
     link_with : all_test_libs)

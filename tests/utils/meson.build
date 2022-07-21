@@ -15,7 +15,8 @@ utilstest = executable('utilstest',
     dependencies : [utilstest_deps, test_deps],
     link_with : [utilstest_libs, test_libs])
 
-test('utils test', utilstest)
+test('utils test', utilstest,
+    verbose : true)
 
 project_test_sources += utilstest_sources
 all_test_deps += utilstest_deps

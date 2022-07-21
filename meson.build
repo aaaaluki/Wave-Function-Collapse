@@ -21,12 +21,17 @@ project_deps = []
 project_libs = []
 subdir('src')
 
-project_bin = executable('wfc', 
-  main_source, 
+project_bin = executable('wfc',
+  main_source,
   include_directories : inc,
   dependencies : project_deps,
   link_with : project_libs,
   install: true)
+
+summary({'bindir': get_option('bindir'),
+        'libdir': get_option('libdir'),
+        'datadir': get_option('datadir'),
+        }, section: 'Directories')
 
 # Make test if specified
 gtest = subproject('gtest')
