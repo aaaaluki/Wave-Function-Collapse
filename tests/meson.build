@@ -1,6 +1,6 @@
+project_test_sources = []
 all_test_deps = []
 all_test_libs = []
-project_test_sources = []
 
 gtest_dep = gtest.get_variable('gtest_dep')
 thread_dep = dependency('threads')

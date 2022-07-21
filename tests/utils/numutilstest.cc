@@ -16,6 +16,4 @@ TEST(next_pow2, HandlesNegativeInput) {
   EXPECT_EQ(next_pow2(-1235), 0);
 }
 
-TEST(next_pow2, HandlesZeroInput) {
-  EXPECT_EQ(next_pow2(0), 0);
-}
+TEST(next_pow2, HandlesZeroInput) { EXPECT_EQ(next_pow2(0), 0); }

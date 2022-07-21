@@ -1,7 +1,7 @@
-utilstest_sources = [
+utilstest_sources = files(
     'numutilstest.cc',
     'stringutilstest.cc'
-]
+)
 
 utilstest_deps = []
 
@@ -17,5 +17,6 @@ utilstest = executable('utilstest',
 
 test('utils test', utilstest)
 
+project_test_sources += utilstest_sources
 all_test_deps += utilstest_deps
 all_test_libs += utilstest_libs

@@ -1,7 +1,6 @@
-dir_files = []
-dir_files += files('colorutils.h')
-dir_files += files('numutils.h')
-dir_files += files('printutils.h')
-dir_files += files('stringutils.h')
-
-project_header_files += dir_files
+project_header_files += files(
+    'colorutils.h',
+    'numutils.h',
+    'printutils.h',
+    'stringutils.h'
+)
