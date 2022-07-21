@@ -12,4 +12,17 @@ TEST(strconcat, HandlesNonNullPointers) {
   char *s = strconcat(s1, s2);
 
   ASSERT_EQ(strcmp(s, "Hello, there!"), 0);
+
+  free(s);
+}
+
+TEST(strconcat, HandlesNullPointers) {
+  const char *s1 = "Hello, ";
+  const char *s2 = NULL;
+
+  char *s = strconcat(s1, s2);
+
+  ASSERT_EQ(s == NULL, true);
+
+  free(s);
 }
