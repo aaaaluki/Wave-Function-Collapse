@@ -81,7 +81,14 @@ int draw_image(int argc, char **argv) {
   }
 
   // Save tile
-  char *savefile = strconcat(dirname, "-tile.png");
+  char *lhs, *rhs;
+  r = strsplit(dirname, '/', STRSPLIT_LAST, &lhs, &rhs);
+  if (r != STRSPLIT_OK) {
+    errmsg("Error spliting string!", EXIT_FAILURE);
+  }
+
+
+  char *savefile = strconcat(rhs, "-tile.png");
   printf("Saving as: %s\n", savefile);
   cairo_surface_write_to_png(surface, savefile);
 
@@ -89,6 +96,8 @@ int draw_image(int argc, char **argv) {
   cairo_destroy(cr);
   cairo_surface_destroy(surface);
 
+  free(lhs);
+  free(rhs);
   free(buff);
   free(globbuf);
 

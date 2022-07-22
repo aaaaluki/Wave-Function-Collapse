@@ -11,4 +11,6 @@
 
 # Test dir
 /test/
-/test_img.png
+
+/*.png
+/tiles/*.png

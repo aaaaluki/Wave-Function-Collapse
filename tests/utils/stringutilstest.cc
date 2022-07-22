@@ -26,3 +26,24 @@ TEST(strconcat, HandlesNullPointers) {
 
   free(s);
 }
+
+TEST(strsplit, AllSpltcharPossiblities) {
+  const char *s = "directory/subdirectory/file.txt";
+  char *lhs, *rhs;
+
+  // Split by last occurence
+  strsplit(s, '/', STRSPLIT_LAST, &lhs, &rhs);
+  EXPECT_EQ(strcmp(lhs, "directory/subdirectory"), 0);
+  EXPECT_EQ(strcmp(rhs, "file.txt"), 0);
+
+  free(lhs);
+  free(rhs);
+
+  // Split by first occurence
+  strsplit(s, '/', STRSPLIT_FIRST, &lhs, &rhs);
+  EXPECT_EQ(strcmp(lhs, "directory"), 0);
+  EXPECT_EQ(strcmp(rhs, "subdirectory/file.txt"), 0);
+
+  free(lhs);
+  free(rhs);
+}
