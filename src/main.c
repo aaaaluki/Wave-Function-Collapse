@@ -37,13 +37,19 @@ int draw_image(int argc, char **argv) {
   }
 
   char *dirname = argv[1];
-  char *buff = strconcat(dirname, "/*.png");
-  if (buff == NULL) {
-    errmsg("Some error occurred while using strconcat()", EXIT_FAILURE);
+  char *buff;
+  int r;
+
+  r = strconcat(dirname, "/*.png", &buff);
+  if (r == STRINGUTILS_NULLINPUT) {
+    errmsg("strconcat() was given a NULL input", EXIT_FAILURE);
+
+  } else if (r == STRINGUTILS_NOSPACE) {
+    errmsg("strconcat() there was a problem allocating memory", EXIT_FAILURE);
   }
 
   glob_t *globbuf = malloc(sizeof(glob_t));
-  int r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
+  r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
 
   if (r == GLOB_ABORTED) {
     errmsg("Some error occurred while globing the tile directory!",
@@ -83,12 +89,26 @@ int draw_image(int argc, char **argv) {
   // Save tile
   char *lhs, *rhs;
   r = strsplit(dirname, '/', STRSPLIT_LAST, &lhs, &rhs);
-  if (r != STRSPLIT_OK) {
-    errmsg("Error spliting string!", EXIT_FAILURE);
+  if (r == STRINGUTILS_NOMATCH) {
+    errmsg("strsplit() the input string does not contain the splitting char",
+           EXIT_FAILURE);
+
+  } else if (r == STRINGUTILS_NULLINPUT) {
+    errmsg("strsplit() was given a NULL input", EXIT_FAILURE);
+
+  } else if (r == STRINGUTILS_NOSPACE) {
+    errmsg("strsplit() there was a problem allocating memory", EXIT_FAILURE);
   }
 
+  char *savefile;
+  r = strconcat(rhs, "-tile.png", &savefile);
+  if (r == STRINGUTILS_NULLINPUT) {
+    errmsg("strconcat() was given a NULL input", EXIT_FAILURE);
 
-  char *savefile = strconcat(rhs, "-tile.png");
+  } else if (r == STRINGUTILS_NOSPACE) {
+    errmsg("strconcat() there was a problem allocating memory", EXIT_FAILURE);
+  }
+
   printf("Saving as: %s\n", savefile);
   cairo_surface_write_to_png(surface, savefile);
 

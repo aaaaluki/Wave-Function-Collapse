@@ -5,29 +5,29 @@
 
 #include "utils/stringutils.h"
 
-char *strconcat(const char *s1, const char *s2) {
-  if (s1 == NULL || s2 == NULL) {
-    return NULL;
+int strconcat(const char *s1, const char *s2, char **sp) {
+  if (s1 == NULL || s2 == NULL || sp == NULL) {
+    return STRINGUTILS_NULLINPUT;
   }
 
   const size_t len1 = strlen(s1);
   const size_t len2 = strlen(s2);
-  char *result = malloc(len1 + len2 + 1);
+  *sp = malloc(len1 + len2 + 1);
 
-  if (result == NULL) {
-    return NULL;
+  if (*sp == NULL) {
+    return STRINGUTILS_NOSPACE;
   }
 
-  memcpy(result, s1, len1);
-  memcpy(result + len1, s2, len2 + 1);
+  memcpy(*sp, s1, len1);
+  memcpy(*sp + len1, s2, len2 + 1);
 
-  return result;
+  return STRINGUTILS_OK;
 }
 
 int strsplit(const char *s, char spltchar, int splttype, char **lhs,
              char **rhs) {
   if (s == NULL || lhs == NULL || rhs == NULL) {
-    return STRSPLIT_NULLINPUT;
+    return STRINGUTILS_NULLINPUT;
   }
 
   unsigned long len = strlen(s);
@@ -46,24 +46,29 @@ int strsplit(const char *s, char spltchar, int splttype, char **lhs,
   }
 
   if (!found) {
-    return STRSPLIT_NOMATCH;
+    return STRINGUTILS_NOMATCH;
   }
 
   // +1 for null terminated string
-  *lhs = calloc(idx + 1, sizeof(char));
+  *lhs = malloc(idx + 1);
 
   // No need to add 1, since the split char is not included
-  *rhs = calloc(len - idx, sizeof(char));
+  *rhs = malloc(len - idx);
 
   if (*lhs == NULL || *rhs == NULL) {
     free(*lhs);
     free(*rhs);
 
-    return STRSPLIT_NOSPACE;
+    return STRINGUTILS_NOSPACE;
   }
 
+  // Copy slices
   memcpy(*lhs, s, idx);
   memcpy(*rhs, s + sizeof(char) * (idx + 1), len - idx - 1);
 
-  return STRSPLIT_OK;
+  // Set last char to null, since they are null terminated strings
+  (*lhs)[idx] = '\0';
+  (*rhs)[len - idx - 1] = '\0';
+
+  return STRINGUTILS_OK;
 }
