@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef STRINGUTILS_H_
-#define STRINGUTILS_H_
+#ifndef UTILS_STRINGUTILS_H
+#define UTILS_STRINGUTILS_H
 
 /* Error returns from 'strsplit'. */
 #define STRINGUTILS_OK        0 /* No errors */
@@ -42,4 +42,4 @@ int strconcat(const char *s1, const char *s2, char **sp);
 int strsplit(const char *s, char spltchar, int splttype, char **lhs,
              char **rhs);
 
-#endif // STRINGUTILS_H_
+#endif // UTILS_STRINGUTILS_H

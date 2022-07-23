@@ -1,9 +1,9 @@
+#include "utils/stringutils.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "utils/stringutils.h"
 
 int strconcat(const char *s1, const char *s2, char **sp) {
   if (s1 == NULL || s2 == NULL || sp == NULL) {

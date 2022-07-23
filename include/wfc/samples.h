@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef WFC_SAMPLES_H_
-#define WFC_SAMPLES_H_
+#ifndef WFC_SAMPLES_H
+#define WFC_SAMPLES_H
 
 /**
  * @brief Gets a folder full of png images and creates a square tile of all the
@@ -23,4 +23,4 @@ int draw_tiles(int argc, char **argv);
  */
 void draw_chessboard(void);
 
-#endif // WFC_SAMPLES_H_
+#endif // WFC_SAMPLES_H

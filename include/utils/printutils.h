@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PRINTUTILS_H_
-#define PRINTUTILS_H_
+#ifndef UTILS_PRINTUTILS_H
+#define UTILS_PRINTUTILS_H
 
 /**
  * @brief Prints the message as an error and exits with exitcode
@@ -15,4 +15,4 @@
  */
 void errmsg(const char *msg, int exitcode);
 
-#endif // PRINTUTILS_H_
+#endif // UTILS_PRINTUTILS_H

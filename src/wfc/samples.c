@@ -1,15 +1,16 @@
+#include "wfc/samples.h"
+
+#include "utils/numutils.h"
+#include "utils/printutils.h"
+#include "utils/stringutils.h"
+
+#include <cairo.h>
+
 #include <glob.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <cairo.h>
-
-#include "utils/numutils.h"
-#include "utils/printutils.h"
-#include "utils/stringutils.h"
-#include "wfc/samples.h"
 
 int draw_tiles(int argc, char **argv) {
   if (argc < 2) {

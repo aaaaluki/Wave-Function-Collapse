@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef NUMUTILS_H_
-#define NUMUTILS_H_
+#ifndef UTILS_NUMUTILS_H
+#define UTILS_NUMUTILS_H
 
 #include <stdint.h>
 
@@ -19,4 +19,4 @@
  */
 uint32_t next_pow2(uint32_t v);
 
-#endif // NUMUTILS_H_
+#endif // UTILS_NUMUTILS_H

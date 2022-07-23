@@ -4,9 +4,8 @@
  *
  */
 
-#ifndef COLOR_H_
-#define COLOR_H_
-
+#ifndef UTILS_COLOR_H
+#define UTILS_COLOR_H
 #define COLOR_RESET "\033[0m"
 
 #define COLOR_BLACK  "\033[0;30m"
@@ -72,4 +71,4 @@
 #define COLOR_CYAN_BACKGROUND_BRIGHT   "\033[0;106m"
 #define COLOR_WHITE_BACKGROUND_BRIGHT  "\033[0;107m"
 
-#endif // COLOR_H_
+#endif // UTILS_COLOR_H

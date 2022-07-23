@@ -1,6 +1,6 @@
-#include <stdint.h>
-
 #include "utils/numutils.h"
+
+#include <stdint.h>
 
 uint32_t next_pow2(uint32_t v) {
   v--;
