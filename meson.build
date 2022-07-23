@@ -3,9 +3,13 @@
 # =======
 project(
     'Wave Function Collapse', ['c', 'cpp'],
-    default_options: ['c_std=c11', 'cpp_std=c++11'],
+    default_options: ['c_std=c11', 'cpp_std=c++11', 'default_library=static'],
     version: 'v0.1'
 )
+
+# Compilers
+cc = meson.get_compiler('c')
+cpp = meson.get_compiler('cpp')
 
 # Variables tracking sources and libraries
 library_path = []

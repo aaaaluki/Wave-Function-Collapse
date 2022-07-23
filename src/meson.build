@@ -1,5 +1,5 @@
 # Project dependencies
-project_deps += meson.get_compiler('c').find_library('m', required : true)
+project_deps += cc.find_library('m', required : true)
 project_deps += dependency('cairo')
 
 # Project sources
