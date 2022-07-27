@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 int draw_tiles(int argc, char **argv) {
-  if (argc < 2) {
+  if (argc != 2) {
     errmsg(EXIT_FAILURE, "Please give a folder with tile images!");
   }
 
@@ -68,9 +68,10 @@ int draw_tiles(int argc, char **argv) {
 
     cairo_set_source_surface(cr, tile, col * w, row * h);
     cairo_paint(cr);
+    cairo_surface_destroy(tile);
   }
 
-  // Save tile
+  // Save tile name
   char *lhs, *rhs;
   r = strsplit(dirname, '/', STRSPLIT_LAST, &lhs, &rhs);
   if (r == STRINGUTILS_NOMATCH) {
