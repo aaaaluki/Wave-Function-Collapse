@@ -18,6 +18,16 @@
 int draw_tiles(int argc, char **argv);
 
 /**
+ * @brief Gets a folder full of png images and creates a tileboard of random
+ * tiles.
+ *
+ * @param argc argc argument from main()
+ * @param argv argv argument from main()
+ * @return int exit code
+ */
+int draw_random_tiles(int argc, char **argv);
+
+/**
  * @brief Draws a chessboard with "Hello, world!" written on the center.
  *
  */

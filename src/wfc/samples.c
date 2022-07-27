@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int draw_tiles(int argc, char **argv) {
   if (argc != 2) {
@@ -87,6 +88,134 @@ int draw_tiles(int argc, char **argv) {
 
   char *savefile;
   r = strconcat(rhs, "-tile.png", &savefile);
+  if (r == STRINGUTILS_NULLINPUT) {
+    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
+
+  } else if (r == STRINGUTILS_NOSPACE) {
+    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
+  }
+
+  printf("Saving as: %s\n", savefile);
+  cairo_surface_write_to_png(surface, savefile);
+
+  // Cleanup
+  cairo_destroy(cr);
+  cairo_surface_destroy(surface);
+
+  free(lhs);
+  free(rhs);
+  free(buff);
+  free(globbuf);
+
+  return EXIT_SUCCESS;
+}
+
+int draw_random_tiles(int argc, char **argv) {
+  const int COLS = 16;
+  const int ROWS = 16;
+
+  if (argc != 2) {
+    errmsg(EXIT_FAILURE, "Please give a folder with tile images!");
+  }
+
+  char *dirname = argv[1];
+  char *buff;
+  int r;
+
+  r = strconcat(dirname, "/*.png", &buff);
+  if (r == STRINGUTILS_NULLINPUT) {
+    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
+
+  } else if (r == STRINGUTILS_NOSPACE) {
+    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
+  }
+
+  glob_t *globbuf = malloc(sizeof(glob_t));
+  r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
+
+  if (r == GLOB_ABORTED) {
+    errmsg(EXIT_FAILURE,
+           "Some error occurred while globing the tile directory!");
+
+  } else if (r == GLOB_NOMATCH) {
+    errmsg(EXIT_FAILURE, "No .png files on the given directory!");
+  }
+
+  int w, h;
+  cairo_surface_t *tile =
+      cairo_image_surface_create_from_png(globbuf->gl_pathv[0]);
+  w = cairo_image_surface_get_width(tile);
+  h = cairo_image_surface_get_height(tile);
+  printf("Tile is %dx%d pixels\n", w, h);
+
+  cairo_surface_t *surface =
+      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, COLS * w, ROWS * h);
+  cairo_t *cr = cairo_create(surface);
+
+  // Check that all the images have the same size
+  for (uint32_t i = 0; i < globbuf->gl_pathc; i++) {
+    tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[i]);
+    if (cairo_image_surface_get_width(tile) != w ||
+        cairo_image_surface_get_height(tile) != h) {
+      errmsg(EXIT_FAILURE, "Tile \"%s\" differs in size", globbuf->gl_pathv[i]);
+    }
+
+    if (cairo_image_surface_get_width(tile) !=
+        cairo_image_surface_get_height(tile)) {
+      errmsg("Tile \"%s\" is not square", globbuf->gl_pathv[i]);
+    }
+
+    cairo_surface_destroy(tile);
+  }
+
+  // Generate random tileboard of tiles from folder
+  uint32_t col, row;
+  uint32_t idx;
+  uint8_t quadrant;
+  srand(time(NULL));
+  for (uint32_t i = 0; i < COLS * ROWS; i++) {
+    col = i % COLS;
+    row = (i - col) / COLS;
+
+    idx = rand() % globbuf->gl_pathc;
+    tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[idx]);
+
+    // 1.- Go to top left of tile that we have to paint
+    cairo_translate(cr, w * col, h * row);
+
+    // 2.- Rotate a random amount of pi/2, respect to the center
+    quadrant = rand() & 0b11;
+    cairo_translate(cr, w / 2, h / 2);
+    cairo_rotate(cr, quadrant * acos(-1.0L) / 2);
+
+    // 3.- Return to the top left of the tile
+    cairo_translate(cr, -w / 2, -h / 2);
+
+    // 4.- Paint tile
+    cairo_set_source_surface(cr, tile, 0, 0);
+    cairo_paint(cr);
+
+    // 5.- Cleanup
+    cairo_identity_matrix(cr);
+    cairo_surface_destroy(tile);
+  }
+
+  // Save tile name
+  char *lhs, *rhs;
+  r = strsplit(dirname, '/', STRSPLIT_LAST, &lhs, &rhs);
+  if (r == STRINGUTILS_NOMATCH) {
+    errmsg(EXIT_FAILURE,
+           "strsplit() the input string does not contain the splitting char");
+
+  } else if (r == STRINGUTILS_NULLINPUT) {
+    errmsg(EXIT_FAILURE, "strsplit() was given a NULL input");
+
+  } else if (r == STRINGUTILS_NOSPACE) {
+    errmsg(EXIT_FAILURE, "strsplit() there was a problem allocating memory");
+  }
+
+  char *savefile;
+  r = strconcat(rhs, "-rand-tile.png", &savefile);
   if (r == STRINGUTILS_NULLINPUT) {
     errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
 
