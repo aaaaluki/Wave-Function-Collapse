@@ -14,7 +14,7 @@
 
 int draw_tiles(int argc, char **argv) {
   if (argc < 2) {
-    errmsg("Please give a folder with tile images!", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "Please give a folder with tile images!");
   }
 
   char *dirname = argv[1];
@@ -23,27 +23,26 @@ int draw_tiles(int argc, char **argv) {
 
   r = strconcat(dirname, "/*.png", &buff);
   if (r == STRINGUTILS_NULLINPUT) {
-    errmsg("strconcat() was given a NULL input", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg("strconcat() there was a problem allocating memory", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
   }
 
   glob_t *globbuf = malloc(sizeof(glob_t));
   r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
 
   if (r == GLOB_ABORTED) {
-    errmsg("Some error occurred while globing the tile directory!",
-           EXIT_FAILURE);
+    errmsg(EXIT_FAILURE,
+           "Some error occurred while globing the tile directory!");
 
   } else if (r == GLOB_NOMATCH) {
-    errmsg("No .png files on the given directory!", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "No .png files on the given directory!");
   }
 
   uint32_t size = next_pow2(globbuf->gl_pathc);
   size = (uint32_t)ceilf(sqrtf((float)size));
 
-  // Get width and height of the tiles
   int w, h;
   cairo_surface_t *tile =
       cairo_image_surface_create_from_png(globbuf->gl_pathv[0]);
@@ -62,6 +61,10 @@ int draw_tiles(int argc, char **argv) {
     row = (i - col) / size;
 
     tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[i]);
+    if (cairo_image_surface_get_width(tile) != w ||
+        cairo_image_surface_get_height(tile) != h) {
+      errmsg(EXIT_FAILURE, "Tile \"%s\" differs in size", globbuf->gl_pathv[i]);
+    }
 
     cairo_set_source_surface(cr, tile, col * w, row * h);
     cairo_paint(cr);
@@ -71,23 +74,23 @@ int draw_tiles(int argc, char **argv) {
   char *lhs, *rhs;
   r = strsplit(dirname, '/', STRSPLIT_LAST, &lhs, &rhs);
   if (r == STRINGUTILS_NOMATCH) {
-    errmsg("strsplit() the input string does not contain the splitting char",
-           EXIT_FAILURE);
+    errmsg(EXIT_FAILURE,
+           "strsplit() the input string does not contain the splitting char");
 
   } else if (r == STRINGUTILS_NULLINPUT) {
-    errmsg("strsplit() was given a NULL input", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "strsplit() was given a NULL input");
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg("strsplit() there was a problem allocating memory", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "strsplit() there was a problem allocating memory");
   }
 
   char *savefile;
   r = strconcat(rhs, "-tile.png", &savefile);
   if (r == STRINGUTILS_NULLINPUT) {
-    errmsg("strconcat() was given a NULL input", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg("strconcat() there was a problem allocating memory", EXIT_FAILURE);
+    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
   }
 
   printf("Saving as: %s\n", savefile);
