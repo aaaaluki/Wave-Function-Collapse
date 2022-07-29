@@ -1,7 +1,3 @@
 #include "wfc/samples.h"
 
-int main(int argc, char **argv) {
-  // return draw_tiles(argc, argv);
-  return draw_random_tiles(argc, argv);
-  // draw_chessboard();
-}
+int main(int argc, char **argv) { return samples_main(argc, argv); }

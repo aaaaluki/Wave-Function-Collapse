@@ -1,5 +1,6 @@
 #include "wfc/samples.h"
 
+#include "utils/constutils.h"
 #include "utils/numutils.h"
 #include "utils/printutils.h"
 #include "utils/stringutils.h"
@@ -13,9 +14,124 @@
 #include <stdlib.h>
 #include <time.h>
 
+int samples_main(int argc, char **argv) {
+  if (argc < 2) {
+    errmsg(EXIT_FAILURE,
+           "Enter the utitity you want to execute:\n"
+           "Usage: %s <num>\n"
+           "\t0 -> draw_chessboard()\n"
+           "\t1 -> draw_tiles()\n"
+           "\t2 -> draw_random_tiles()",
+           argv[0]);
+  }
+
+  // Get a copy of argc and argv without the utility number
+  int samples_argc = argc - 1;
+  char **samples_argv = malloc(samples_argc * sizeof(char *));
+
+  samples_argv[0] = argv[0];
+  for (int i = 2; i < argc; i++) {
+    samples_argv[i - 1] = argv[i];
+  }
+
+  // Execute desired utilites
+  int opt = atoi(argv[1]);
+  switch (opt) {
+  case 0:
+    return draw_chessboard();
+    break;
+
+  case 1:
+    return draw_tiles(samples_argc, samples_argv);
+    break;
+
+  case 2:
+    return draw_random_tiles(samples_argc, samples_argv);
+    break;
+
+  default:
+    errmsg(EXIT_FAILURE,
+           "Enter the utitity you want to execute:\n"
+           "Usage: %s <num>\n"
+           "\t0 -> draw_chessboard()\n"
+           "\t1 -> draw_tiles()\n"
+           "\t2 -> draw_random_tiles()",
+           argv[0]);
+    break;
+  }
+
+  return EXIT_SUCCESS;
+}
+
+int draw_chessboard(void) {
+  const int WIDTH = 256;
+  const int HEIGHT = 256;
+  const int NCOLS = 8;
+  const int NROWS = 8;
+
+  const char *MSG = "Hello, world!";
+
+  // Create surface
+  cairo_surface_t *surface =
+      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, HEIGHT);
+  cairo_t *cr = cairo_create(surface);
+
+  // Set background to black
+  cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+  cairo_paint(cr);
+
+  // Draw some kind of grid
+  uint32_t w, h;
+  w = WIDTH / NCOLS;
+  h = HEIGHT / NROWS;
+  for (uint32_t i = 0; i < NROWS; i++) {
+    for (uint32_t j = 0; j < NCOLS; j++) {
+      cairo_rectangle(cr, w * j, h * i, w, h);
+
+      if ((i + j) % 2 == 0) {
+        cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+      } else {
+        cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+      }
+
+      cairo_fill(cr);
+    }
+  }
+
+  // Draw text in the middle
+  cairo_text_extents_t *extents = malloc(sizeof(cairo_text_extents_t));
+  double x, y;
+
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, 32.0);
+  cairo_set_source_rgb(cr, 0.2, 0.7, 0.5);
+  cairo_text_extents(cr, MSG, extents);
+  x = WIDTH / 2 - (extents->width / 2 + extents->x_bearing);
+  y = HEIGHT / 2 - (extents->height / 2 + extents->y_bearing);
+  cairo_move_to(cr, x, y);
+  cairo_show_text(cr, MSG);
+
+  // Save image
+  const char *savefile = "draw-chessboard.png";
+  printf("Saving as: %s\n", savefile);
+  cairo_surface_write_to_png(surface, savefile);
+
+  // Cleanup
+  cairo_destroy(cr);
+  cairo_surface_destroy(surface);
+
+  free(extents);
+
+  return EXIT_SUCCESS;
+}
+
 int draw_tiles(int argc, char **argv) {
   if (argc != 2) {
-    errmsg(EXIT_FAILURE, "Please give a folder with tile images!");
+    errmsg(EXIT_FAILURE,
+           "Please give a folder with tile images:\n"
+           "Usage: %s <folder>",
+           argv[0]);
   }
 
   char *dirname = argv[1];
@@ -86,8 +202,10 @@ int draw_tiles(int argc, char **argv) {
     errmsg(EXIT_FAILURE, "strsplit() there was a problem allocating memory");
   }
 
+  // FIXME: make strconcat() get variadic args to concat
   char *savefile;
-  r = strconcat(rhs, "-tile.png", &savefile);
+  r = strconcat(rhs, ".png", &savefile);
+  r = strconcat("draw-tiles-", savefile, &savefile);
   if (r == STRINGUTILS_NULLINPUT) {
     errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
 
@@ -111,12 +229,23 @@ int draw_tiles(int argc, char **argv) {
 }
 
 int draw_random_tiles(int argc, char **argv) {
-  const int COLS = 16;
-  const int ROWS = 16;
-
-  if (argc != 2) {
-    errmsg(EXIT_FAILURE, "Please give a folder with tile images!");
+  if (argc < 2) {
+    errmsg(EXIT_FAILURE,
+           "Please give a folder with tile images:\n"
+           "Usage: %s <folder> [NCOLS] [NROWS]",
+           argv[0]);
   }
+
+  int COLS = 0;
+  int ROWS = 0;
+  if (argc >= 4) {
+    COLS = atoi(argv[2]);
+    ROWS = atoi(argv[3]);
+  }
+
+  // Make sure COLS and ROWS are positive int
+  COLS = COLS < 1 ? 16 : COLS;
+  ROWS = ROWS < 1 ? 16 : ROWS;
 
   char *dirname = argv[1];
   char *buff;
@@ -162,7 +291,7 @@ int draw_random_tiles(int argc, char **argv) {
 
     if (cairo_image_surface_get_width(tile) !=
         cairo_image_surface_get_height(tile)) {
-      errmsg("Tile \"%s\" is not square", globbuf->gl_pathv[i]);
+      errmsg(EXIT_FAILURE, "Tile \"%s\" is not square", globbuf->gl_pathv[i]);
     }
 
     cairo_surface_destroy(tile);
@@ -184,9 +313,9 @@ int draw_random_tiles(int argc, char **argv) {
     cairo_translate(cr, w * col, h * row);
 
     // 2.- Rotate a random amount of pi/2, respect to the center
-    quadrant = rand() & 0b11;
+    quadrant = rand() % 4;
     cairo_translate(cr, w / 2, h / 2);
-    cairo_rotate(cr, quadrant * acos(-1.0L) / 2);
+    cairo_rotate(cr, quadrant * M_PI / 2);
 
     // 3.- Return to the top left of the tile
     cairo_translate(cr, -w / 2, -h / 2);
@@ -214,8 +343,10 @@ int draw_random_tiles(int argc, char **argv) {
     errmsg(EXIT_FAILURE, "strsplit() there was a problem allocating memory");
   }
 
+  // FIXME: make strconcat() get variadic args to concat
   char *savefile;
-  r = strconcat(rhs, "-rand-tile.png", &savefile);
+  r = strconcat(rhs, ".png", &savefile);
+  r = strconcat("draw-random-tiles-", savefile, &savefile);
   if (r == STRINGUTILS_NULLINPUT) {
     errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
 
@@ -236,61 +367,4 @@ int draw_random_tiles(int argc, char **argv) {
   free(globbuf);
 
   return EXIT_SUCCESS;
-}
-
-void draw_chessboard(void) {
-  const int WIDTH = 256;
-  const int HEIGHT = 256;
-  const int NCOLS = 8;
-  const int NROWS = 8;
-
-  const char *MSG = "Hello, world!";
-
-  // Create surface
-  cairo_surface_t *surface =
-      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, HEIGHT);
-  cairo_t *cr = cairo_create(surface);
-
-  // Set background to black
-  cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
-  cairo_paint(cr);
-
-  // Draw some kind of grid
-  uint32_t w, h;
-  w = WIDTH / NCOLS;
-  h = HEIGHT / NROWS;
-  for (uint32_t i = 0; i < NROWS; i++) {
-    for (uint32_t j = 0; j < NCOLS; j++) {
-      cairo_rectangle(cr, w * j, h * i, w, h);
-
-      if ((i + j) % 2 == 0) {
-        cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
-      } else {
-        cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
-      }
-
-      cairo_fill(cr);
-    }
-  }
-
-  // Draw text in the middle
-  cairo_text_extents_t *extents = malloc(sizeof(cairo_text_extents_t));
-  double x, y;
-
-  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
-                         CAIRO_FONT_WEIGHT_NORMAL);
-  cairo_set_font_size(cr, 32.0);
-  cairo_set_source_rgb(cr, 0.2, 0.7, 0.5);
-  cairo_text_extents(cr, MSG, extents);
-  x = WIDTH / 2 - (extents->width / 2 + extents->x_bearing);
-  y = HEIGHT / 2 - (extents->height / 2 + extents->y_bearing);
-  cairo_move_to(cr, x, y);
-  cairo_show_text(cr, MSG);
-
-  // Cleanup
-  cairo_destroy(cr);
-  cairo_surface_write_to_png(surface, "hello.png");
-  cairo_surface_destroy(surface);
-
-  free(extents);
 }

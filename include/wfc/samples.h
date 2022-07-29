@@ -8,6 +8,22 @@
 #define WFC_SAMPLES_H
 
 /**
+ * @brief Main wrapper for all the sample utilites
+ *
+ * @param argc argc argument from main()
+ * @param argv argv argument from main()
+ * @return int exit code
+ */
+int samples_main(int argc, char **argv);
+
+/**
+ * @brief Draws a chessboard with "Hello, world!" written on the center.
+ *
+ * @return int exit code
+ */
+int draw_chessboard(void);
+
+/**
  * @brief Gets a folder full of png images and creates a square tile of all the
  * images. The size of all the tiles must be the same.
  *
@@ -26,11 +42,5 @@ int draw_tiles(int argc, char **argv);
  * @return int exit code
  */
 int draw_random_tiles(int argc, char **argv);
-
-/**
- * @brief Draws a chessboard with "Hello, world!" written on the center.
- *
- */
-void draw_chessboard(void);
 
 #endif // WFC_SAMPLES_H
