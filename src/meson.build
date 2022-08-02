@@ -9,5 +9,6 @@ project_deps += m_dep
 main_source = files('main.c')
 project_sources += main_source
 
+subdir('argparse')
 subdir('utils')
 subdir('wfc')
