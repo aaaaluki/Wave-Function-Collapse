@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ERR_FILE stderr
+
 void argparse_init(AParse *ap, int argc, const char **argv, const char *ostr) {
   ap = memset(ap, 0, sizeof(AParse));
 
@@ -39,7 +41,7 @@ int argparse_next(AParse *ap) {
   }
 
   if (!(ostrptr = strchr(ap->ostr, *argptr))) { /* option not in ostr */
-    fprintf(stderr, "%s -- does not have option -%c\n", ap->argv[0], *argptr);
+    fprintf(ERR_FILE, "%s -- does not have option -%c\n", ap->argv[0], *argptr);
     return -1;
   }
 
@@ -49,7 +51,7 @@ int argparse_next(AParse *ap) {
       ap->arg = argptr;
 
     } else if (++ap->idx >= ap->argc) { /* no arg given */
-      fprintf(stderr, "%s -- option -%c needs an argument\n", ap->argv[0],
+      fprintf(ERR_FILE, "%s -- option -%c needs an argument\n", ap->argv[0],
               ap->opt);
       return -1;
 

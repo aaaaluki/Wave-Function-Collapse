@@ -14,6 +14,7 @@ test_deps = [
 test_libs = []
 
 # Add subdirs here
+subdir('argparse')
 subdir('utils')
 
 # This executable contains all the tests
