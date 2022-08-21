@@ -8,6 +8,7 @@
 #define ARGPARSE_ARGPARSE_H
 
 typedef struct argparse_t {
+  int err;           /* error flag */
   int idx;           /* current argv index */
   int opt;           /* current option */
   const char *arg;   /* current argument */

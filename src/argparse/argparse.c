@@ -9,6 +9,7 @@
 void argparse_init(AParse *ap, int argc, const char **argv, const char *ostr) {
   ap = memset(ap, 0, sizeof(AParse));
 
+  ap->err = 0;
   ap->idx = 1;
   ap->opt = 0;
   ap->arg = NULL;
@@ -29,11 +30,13 @@ int argparse_next(AParse *ap) {
 
     if (*(argptr = ap->argv[ap->idx]) != '-') {
       /* option does not start with - */
+      ap->err = 1;
       return -1;
     }
 
     if (argptr[1] && *++argptr == '-') {
       /* -- given */
+      ap->err = 1;
       ap->idx++;
       argptr = "";
       return -1;
@@ -41,6 +44,7 @@ int argparse_next(AParse *ap) {
   }
 
   if (!(ostrptr = strchr(ap->ostr, *argptr))) { /* option not in ostr */
+    ap->err = 1;
     fprintf(ERR_FILE, "%s -- does not have option -%c\n", ap->argv[0], *argptr);
     return -1;
   }
@@ -51,6 +55,7 @@ int argparse_next(AParse *ap) {
       ap->arg = argptr;
 
     } else if (++ap->idx >= ap->argc) { /* no arg given */
+      ap->err = 1;
       fprintf(ERR_FILE, "%s -- option -%c needs an argument\n", ap->argv[0],
               ap->opt);
       return -1;
