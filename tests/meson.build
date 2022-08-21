@@ -1,3 +1,6 @@
+# Test vars
+tests_verbose = false
+
 project_test_sources = []
 all_test_deps = []
 all_test_libs = []

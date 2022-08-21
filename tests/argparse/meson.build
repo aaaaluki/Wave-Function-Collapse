@@ -15,7 +15,7 @@ argparsetest = executable('argparsetest',
     link_with : [argparsetest_libs, test_libs])
 
 test('argparse test', argparsetest,
-    verbose : true)
+    verbose : tests_verbose)
 
 project_test_sources += argparsetest_sources
 all_test_deps += argparsetest_deps
