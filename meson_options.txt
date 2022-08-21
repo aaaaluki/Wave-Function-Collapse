@@ -3,3 +3,10 @@ option('enable-tests',
   value : true,
   description : 'Enables tests.'
 )
+
+option('tests-verbose',
+  type : 'boolean',
+  value : false,
+  description : 'Sets tests verbosity.'
+)
+

@@ -16,7 +16,7 @@ utilstest = executable('utilstest',
     link_with : [utilstest_libs, test_libs])
 
 test('utils test', utilstest,
-    verbose : tests_verbose)
+    verbose : get_option('tests-verbose'))
 
 project_test_sources += utilstest_sources
 all_test_deps += utilstest_deps
