@@ -1,5 +1,6 @@
 #include "wfc/samples.h"
 
+#include "argparse/argparse.h"
 #include "utils/constutils.h"
 #include "utils/numutils.h"
 #include "utils/printutils.h"
@@ -14,50 +15,67 @@
 #include <stdlib.h>
 #include <time.h>
 
+static char *progname;
+
+static int usage(int v) {
+  if (v < 2) {
+    printf("Usage: %s -u <utility> [utility-args ...]\n"
+           "Utilities:\n"
+           "    0 : draw_chessboard()\n"
+           "    1 : draw_tiles()\n"
+           "    2 : draw_random_tiles()\n",
+           progname);
+
+  } else {
+    printf("Usage: %s -u <utility> [utility-args ...]\n"
+           "Utilities:\n"
+           "    0 : draw_chessboard()\n"
+           "    1 : draw_tiles()\n"
+           "        -d <directory>\n"
+           "    2 : draw_random_tiles()\n"
+           "        -d <directory> [-r <rows>] [-c <columns>]\n",
+           progname);
+  }
+
+  return EXIT_FAILURE;
+}
+
 int samples_main(int argc, char **argv) {
-  if (argc < 2) {
-    errmsg(EXIT_FAILURE,
-           "Enter the utitity you want to execute:\n"
-           "Usage: %s <num>\n"
-           "\t0 -> draw_chessboard()\n"
-           "\t1 -> draw_tiles()\n"
-           "\t2 -> draw_random_tiles()",
-           argv[0]);
+  AParse ap;
+  argparse_init(&ap, argc, argv, "hu:d:c:r:");
+  progname = argv[0];
+
+  // Parse general args
+  int h = 0;
+  int u = -1;
+  int o;
+  const char *d, *c, *r;
+  while ((o = argparse_next(&ap)) != -1) {
+    switch (o) {
+    case 'h': h++; break;
+    case 'u': u = atoi(ap.arg); break;
+    case 'd': d = ap.arg; break;
+    case 'c': c = ap.arg; break;
+    case 'r': r = ap.arg; break;
+    default: return usage(0);
+    }
   }
 
-  // Get a copy of argc and argv without the utility number
-  int samples_argc = argc - 1;
-  char **samples_argv = malloc(samples_argc * sizeof(char *));
-
-  samples_argv[0] = argv[0];
-  for (int i = 2; i < argc; i++) {
-    samples_argv[i - 1] = argv[i];
+  if (ap.err) {
+    return usage(0);
   }
 
-  // Execute desired utilites
-  int opt = atoi(argv[1]);
-  switch (opt) {
-  case 0:
-    return draw_chessboard();
-    break;
+  if (h > 0) {
+    return usage(h);
+  }
 
-  case 1:
-    return draw_tiles(samples_argc, samples_argv);
-    break;
-
-  case 2:
-    return draw_random_tiles(samples_argc, samples_argv);
-    break;
-
-  default:
-    errmsg(EXIT_FAILURE,
-           "Enter the utitity you want to execute:\n"
-           "Usage: %s <num>\n"
-           "\t0 -> draw_chessboard()\n"
-           "\t1 -> draw_tiles()\n"
-           "\t2 -> draw_random_tiles()",
-           argv[0]);
-    break;
+  // Select utlity
+  // FIXME: find a nicer way to parse the arguments for each utility.
+  switch (u) {
+  case 0: draw_chessboard(); break;
+  case 1: draw_tiles(d); break;
+  case 2: draw_random_tiles(d, atoi(c), atoi(r)); break;
+  default: usage(0); break;
   }
 
   return EXIT_SUCCESS;
@@ -126,15 +144,7 @@ int draw_chessboard(void) {
   return EXIT_SUCCESS;
 }
 
-int draw_tiles(int argc, char **argv) {
-  if (argc != 2) {
-    errmsg(EXIT_FAILURE,
-           "Please give a folder with tile images:\n"
-           "Usage: %s <folder>",
-           argv[0]);
-  }
-
-  char *dirname = argv[1];
+int draw_tiles(const char *dirname) {
   char *buff;
   int r;
 
@@ -228,26 +238,11 @@ int draw_tiles(int argc, char **argv) {
   return EXIT_SUCCESS;
 }
 
-int draw_random_tiles(int argc, char **argv) {
-  if (argc < 2) {
-    errmsg(EXIT_FAILURE,
-           "Please give a folder with tile images:\n"
-           "Usage: %s <folder> [NCOLS] [NROWS]",
-           argv[0]);
-  }
-
-  int COLS = 0;
-  int ROWS = 0;
-  if (argc >= 4) {
-    COLS = atoi(argv[2]);
-    ROWS = atoi(argv[3]);
-  }
-
+int draw_random_tiles(const char *dirname, int cols, int rows) {
   // Make sure COLS and ROWS are positive int
-  COLS = COLS < 1 ? 16 : COLS;
-  ROWS = ROWS < 1 ? 16 : ROWS;
+  cols = cols < 1 ? 16 : cols;
+  rows = rows < 1 ? 16 : rows;
 
-  char *dirname = argv[1];
   char *buff;
   int r;
 
@@ -278,7 +273,7 @@ int draw_random_tiles(int argc, char **argv) {
   printf("Tile is %dx%d pixels\n", w, h);
 
   cairo_surface_t *surface =
-      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, COLS * w, ROWS * h);
+      cairo_image_surface_create(CAIRO_FORMAT_ARGB32, cols * w, rows * h);
   cairo_t *cr = cairo_create(surface);
 
   // Check that all the images have the same size
@@ -302,9 +297,9 @@ int draw_random_tiles(int argc, char **argv) {
   uint32_t idx;
   uint8_t quadrant;
   srand(time(NULL));
-  for (uint32_t i = 0; i < COLS * ROWS; i++) {
-    col = i % COLS;
-    row = (i - col) / COLS;
+  for (uint32_t i = 0; i < cols * rows; i++) {
+    col = i % cols;
+    row = (i - col) / cols;
 
     idx = rand() % globbuf->gl_pathc;
     tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[idx]);
