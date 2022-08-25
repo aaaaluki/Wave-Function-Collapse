@@ -150,21 +150,24 @@ int draw_tiles(const char *dirname) {
 
   r = strconcat(dirname, "/*.png", &buff);
   if (r == STRINGUTILS_NULLINPUT) {
-    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
+    errmsg("strconcat() was given a NULL input");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
+    errmsg("strconcat() there was a problem allocating memory");
+    return EXIT_FAILURE;
   }
 
   glob_t *globbuf = malloc(sizeof(glob_t));
   r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
 
   if (r == GLOB_ABORTED) {
-    errmsg(EXIT_FAILURE,
-           "Some error occurred while globing the tile directory!");
+    errmsg("Some error occurred while globing the tile directory!");
+    return EXIT_FAILURE;
 
   } else if (r == GLOB_NOMATCH) {
-    errmsg(EXIT_FAILURE, "No .png files on the given directory!");
+    errmsg("No .png files on the given directory!");
+    return EXIT_FAILURE;
   }
 
   uint32_t size = next_pow2(globbuf->gl_pathc);
@@ -190,7 +193,8 @@ int draw_tiles(const char *dirname) {
     tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[i]);
     if (cairo_image_surface_get_width(tile) != w ||
         cairo_image_surface_get_height(tile) != h) {
-      errmsg(EXIT_FAILURE, "Tile \"%s\" differs in size", globbuf->gl_pathv[i]);
+      errmsg("Tile \"%s\" differs in size", globbuf->gl_pathv[i]);
+      return EXIT_FAILURE;
     }
 
     cairo_set_source_surface(cr, tile, col * w, row * h);
@@ -202,14 +206,16 @@ int draw_tiles(const char *dirname) {
   char *lhs, *rhs;
   r = strsplit(dirname, '/', STRSPLIT_LAST, &lhs, &rhs);
   if (r == STRINGUTILS_NOMATCH) {
-    errmsg(EXIT_FAILURE,
-           "strsplit() the input string does not contain the splitting char");
+    errmsg("strsplit() the input string does not contain the splitting char");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NULLINPUT) {
-    errmsg(EXIT_FAILURE, "strsplit() was given a NULL input");
+    errmsg("strsplit() was given a NULL input");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg(EXIT_FAILURE, "strsplit() there was a problem allocating memory");
+    errmsg("strsplit() there was a problem allocating memory");
+    return EXIT_FAILURE;
   }
 
   // FIXME: make strconcat() get variadic args to concat
@@ -217,10 +223,12 @@ int draw_tiles(const char *dirname) {
   r = strconcat(rhs, ".png", &savefile);
   r = strconcat("draw-tiles-", savefile, &savefile);
   if (r == STRINGUTILS_NULLINPUT) {
-    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
+    errmsg("strconcat() was given a NULL input");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
+    errmsg("strconcat() there was a problem allocating memory");
+    return EXIT_FAILURE;
   }
 
   printf("Saving as: %s\n", savefile);
@@ -248,21 +256,24 @@ int draw_random_tiles(const char *dirname, int cols, int rows) {
 
   r = strconcat(dirname, "/*.png", &buff);
   if (r == STRINGUTILS_NULLINPUT) {
-    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
+    errmsg("strconcat() was given a NULL input");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
+    errmsg("strconcat() there was a problem allocating memory");
+    return EXIT_FAILURE;
   }
 
   glob_t *globbuf = malloc(sizeof(glob_t));
   r = glob(buff, GLOB_ERR | GLOB_MARK, NULL, globbuf);
 
   if (r == GLOB_ABORTED) {
-    errmsg(EXIT_FAILURE,
-           "Some error occurred while globing the tile directory!");
+    errmsg("Some error occurred while globing the tile directory!");
+    return EXIT_FAILURE;
 
   } else if (r == GLOB_NOMATCH) {
-    errmsg(EXIT_FAILURE, "No .png files on the given directory!");
+    errmsg("No .png files on the given directory!");
+    return EXIT_FAILURE;
   }
 
   int w, h;
@@ -281,12 +292,13 @@ int draw_random_tiles(const char *dirname, int cols, int rows) {
     tile = cairo_image_surface_create_from_png(globbuf->gl_pathv[i]);
     if (cairo_image_surface_get_width(tile) != w ||
         cairo_image_surface_get_height(tile) != h) {
-      errmsg(EXIT_FAILURE, "Tile \"%s\" differs in size", globbuf->gl_pathv[i]);
+      errmsg("Tile \"%s\" differs in size", globbuf->gl_pathv[i]);
+      return EXIT_FAILURE;
     }
 
     if (cairo_image_surface_get_width(tile) !=
         cairo_image_surface_get_height(tile)) {
-      errmsg(EXIT_FAILURE, "Tile \"%s\" is not square", globbuf->gl_pathv[i]);
+      errmsg("Tile \"%s\" is not square", globbuf->gl_pathv[i]);
     }
 
     cairo_surface_destroy(tile);
@@ -328,14 +340,16 @@ int draw_random_tiles(const char *dirname, int cols, int rows) {
   char *lhs, *rhs;
   r = strsplit(dirname, '/', STRSPLIT_LAST, &lhs, &rhs);
   if (r == STRINGUTILS_NOMATCH) {
-    errmsg(EXIT_FAILURE,
-           "strsplit() the input string does not contain the splitting char");
+    errmsg("strsplit() the input string does not contain the splitting char");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NULLINPUT) {
-    errmsg(EXIT_FAILURE, "strsplit() was given a NULL input");
+    errmsg("strsplit() was given a NULL input");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg(EXIT_FAILURE, "strsplit() there was a problem allocating memory");
+    errmsg("strsplit() there was a problem allocating memory");
+    return EXIT_FAILURE;
   }
 
   // FIXME: make strconcat() get variadic args to concat
@@ -343,10 +357,12 @@ int draw_random_tiles(const char *dirname, int cols, int rows) {
   r = strconcat(rhs, ".png", &savefile);
   r = strconcat("draw-random-tiles-", savefile, &savefile);
   if (r == STRINGUTILS_NULLINPUT) {
-    errmsg(EXIT_FAILURE, "strconcat() was given a NULL input");
+    errmsg("strconcat() was given a NULL input");
+    return EXIT_FAILURE;
 
   } else if (r == STRINGUTILS_NOSPACE) {
-    errmsg(EXIT_FAILURE, "strconcat() there was a problem allocating memory");
+    errmsg("strconcat() there was a problem allocating memory");
+    return EXIT_FAILURE;
   }
 
   printf("Saving as: %s\n", savefile);

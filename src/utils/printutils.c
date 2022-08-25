@@ -8,7 +8,7 @@
 
 #define ERR_OUT stderr
 
-void errmsg(int exitcode, const char *fmt, ...) {
+void errmsg(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
 
@@ -17,6 +17,4 @@ void errmsg(int exitcode, const char *fmt, ...) {
   fprintf(ERR_OUT, "\n");
 
   va_end(args);
-
-  exit(EXIT_FAILURE);
 }
