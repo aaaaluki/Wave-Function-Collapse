@@ -49,7 +49,9 @@ int samples_main(int argc, char **argv) {
   int h = 0;
   int u = -1;
   int o;
-  const char *d, *c, *r;
+  const char *d = NULL;
+  const char *c = NULL;
+  const char *r = NULL;
   while ((o = argparse_next(&ap)) != -1) {
     switch (o) {
     case 'h': h++; break;
@@ -73,8 +75,20 @@ int samples_main(int argc, char **argv) {
   // FIXME: find a nicer way to parse the arguments for each utility.
   switch (u) {
   case 0: draw_chessboard(); break;
-  case 1: draw_tiles(d); break;
-  case 2: draw_random_tiles(d, atoi(c), atoi(r)); break;
+  case 1:
+    if (d == NULL) {
+      errmsg("must provide a directory");
+      return usage(0);
+    }
+    draw_tiles(d);
+    break;
+  case 2:
+    if (d == NULL) {
+      errmsg("must provide a directory");
+      return usage(0);
+    }
+    draw_random_tiles(d, atoi(c), atoi(r));
+    break;
   default: usage(0); break;
   }
 
